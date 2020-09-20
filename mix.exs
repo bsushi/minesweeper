@@ -4,11 +4,12 @@ defmodule Minesweeper.Mixfile do
   def project do
     [
       app: :minesweeper,
-      version: "0.0.1",
+      version: "0.0.2",
       elixir: "~> 1.10.4",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -40,6 +41,18 @@ defmodule Minesweeper.Mixfile do
       {:plug_cowboy, "~> 2.2"},
       {:phoenix_live_view, "~> 0.14.1"},
       {:poison, "~> 3.1"}
+    ]
+  end
+
+  # Aliases are shortcuts or tasks specific to the current project.
+  # For example, to install project dependencies and perform other setup tasks, run:
+  #
+  #     $ mix setup
+  #
+  # See the documentation for `Mix` for more info on aliases.
+  defp aliases do
+    [
+      setup: ["deps.get", "cmd npm install --prefix assets"]
     ]
   end
 end

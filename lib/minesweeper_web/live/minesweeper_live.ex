@@ -1,9 +1,12 @@
 defmodule MinesweeperWeb.MinesweeperLive do
   use Phoenix.LiveView
+  alias Minesweeper.Presence
 
   @rows 16
   @columns 30
   @mine_count 99
+
+  @presence_topic "presence"
 
   # possible mine states:
   # unchecked
@@ -20,6 +23,11 @@ defmodule MinesweeperWeb.MinesweeperLive do
     # randomly generate mines
     random_initial_x = Enum.random(1..@rows)
     random_initial_y = Enum.random(1..@columns)
+
+    Presence.track(self(), @presence_topic, socket.id, %{})
+    MinesweeperWeb.Endpoint.subscribe(@presence_topic)
+
+
 
     socket =
       socket
@@ -91,6 +99,15 @@ defmodule MinesweeperWeb.MinesweeperLive do
     end
   end
 
+  def handle_info(
+       %{event: "presence_diff", payload: %{joins: joins, leaves: leaves}},
+       %{assigns: %{present: present}} = socket
+     ) do
+    new_present = present + map_size(joins) - map_size(leaves)
+
+    {:noreply, assign(socket, :present, new_present)}
+  end
+
   # private helpers
 
   defp schedule_tick(socket) do
@@ -99,11 +116,15 @@ defmodule MinesweeperWeb.MinesweeperLive do
   end
 
   defp new_game(socket, initial_x, initial_y) do
+    initial_present =
+      Presence.list(@presence_topic)
+      |> map_size
     assign(socket,
       rows: rows(initial_x, initial_y),
       flag_count: 0,
       mine_count: @mine_count,
       time: 0,
+      present: initial_present,
       game_status: "alive",
       game_started?: false,
       game_ended?: false

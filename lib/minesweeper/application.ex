@@ -8,9 +8,12 @@ defmodule Minesweeper.Application do
     children = [
       # Start the endpoint when the application starts
       MinesweeperWeb.Endpoint,
+
       # Start your own worker by calling: Minesweeper.Worker.start_link(arg1, arg2, arg3)
       # worker(Minesweeper.Worker, [arg1, arg2, arg3]),
-      {Phoenix.PubSub, [name: Minesweeper.PubSub, adapter: Phoenix.PubSub.PG2]}
+      # {Phoenix.PubSub, [name: Minesweeper.PubSub, adapter: Phoenix.PubSub.PG2]},
+      {Phoenix.PubSub, name: Minesweeper.PubSub},
+      Minesweeper.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
